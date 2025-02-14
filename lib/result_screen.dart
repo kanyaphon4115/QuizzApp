@@ -1,76 +1,98 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/main.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:myapp/data/quizz.dart';
+import 'package:myapp/questions_screen.dart';
+import 'package:myapp/question_summary.dart';
 import 'package:myapp/start_screen.dart';
 
 class ResultScreen extends StatelessWidget {
-  const ResultScreen({required this.selectAnswers, super.key});
+  final List<String> selectedAnswers;
 
-  final List<String> selectAnswers;
+  const ResultScreen({
+    required this.selectedAnswers,
+    super.key,
+  });
+
+  List<Map<String, Object>> getSummaryData() {
+    List<Map<String, Object>> summaryData = [];
+
+    for (int i = 0; i < selectedAnswers.length; i++) {
+      bool isCorrect = selectedAnswers[i] == questions[i].answers[0];
+
+      summaryData.add({
+        'question_id': i,
+        'question': questions[i].question,
+        'correct_answer': questions[i].answers[0],
+        'user_answer': selectedAnswers[i],
+        'is_correct': isCorrect,
+      });
+    }
+    return summaryData;
+  }
 
   @override
   Widget build(BuildContext context) {
-    // สมมติว่า "correctAnswers" คือคำตอบที่ถูกต้อง
-    List<String> correctAnswers = [
-      "'Widgets",
-      "By combining widgets in code",
-      "'StatelessWidget",
-      "The UI is not updated",
-      "Update UI as data changes",
-      "By calling setState()"
-    ]; // ตัวอย่างคำตอบที่ถูกต้อง
+    final summarydata = getSummaryData();
+    final totalMark =
+        summarydata.where((data) => data['is_correct'] as bool).length;
+    final totalQuestion = questions.length;
 
-    // คำนวณจำนวนคำตอบที่ถูกต้อง
-    int correctCount = 0;
-    for (int i = 0; i < selectAnswers.length; i++) {
-      if (selectAnswers[i] == correctAnswers[i]) {
-        correctCount++;
-      }
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Quiz Results"),
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 4, 16, 255), // สีน้ำเงินเข้ม
-              Color.fromARGB(255, 75, 248, 230), // สีฟ้า
-            ],
+    return MaterialApp(
+      home: Scaffold(
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.purple, Colors.deepPurple],
+            ),
           ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // แสดงผลลัพธ์การทำแบบทดสอบ
-              Text(
-                "You answered $correctCount out of ${correctAnswers.length} questions correctly!",
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white, // ใช้สีขาวเพื่อให้ข้อความมองเห็นชัด
-                ),
+          child: SizedBox(
+            child: Container(
+              margin: const EdgeInsets.all(40),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'You answered $totalMark out of $totalQuestion questions correctly!',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.lato(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: const Color.fromARGB(255, 201, 153, 251),
+                    ),
+                  ),
+                  QuestionSummary(summaryData: getSummaryData()),
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const StartScreen()));
+                    },
+                    icon: const Icon(
+                      Icons.refresh,
+                      color: Colors.white,
+                    ),
+                    label: const Text(
+                      'Restart Quiz',
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      shadowColor: Colors.transparent,
+                      backgroundColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20), // เพิ่มระยะห่างระหว่างข้อความและปุ่ม
-              // ปุ่ม Restart Quiz
-              ElevatedButton.icon(
-                onPressed: () {
-                  // เมื่อกดปุ่มให้กลับไปยังหน้าจอเริ่มต้น (StartScreen)
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MyApp()),
-                  );
-                },
-                icon: const Icon(Icons.restart_alt), // ไอคอนสำหรับการรีสตาร์ท
-                label: const Text("Restart Quiz"), // ข้อความบนปุ่ม
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  textStyle: const TextStyle(fontSize: 16),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
