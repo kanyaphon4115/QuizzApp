@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class AnswerButton extends StatelessWidget {
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:3777118892.
   const AnswerButton({
     super.key,
     required this.answer,
@@ -24,7 +23,7 @@ class AnswerButton extends StatelessWidget {
               backgroundColor: const Color.fromARGB(255, 33, 1, 95),
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(40),
               ),
             ),
             child: Text(answer, textAlign: TextAlign.center,),
